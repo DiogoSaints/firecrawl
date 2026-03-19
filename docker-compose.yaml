@@ -1,11 +1,6 @@
 name: firecrawl
-
-x-common-service: &common-service
-  # NOTE: If you don't want to build the service locally,
-  # comment out the build: statement and uncomment the image: statement
-  # image: ghcr.io/firecrawl/firecrawl
+x-common-service:
   build: apps/api
-
   ulimits:
     nofile:
       soft: 65535
@@ -13,88 +8,123 @@ x-common-service: &common-service
   networks:
     - backend
   extra_hosts:
-    - "host.docker.internal:host-gateway"
+    - 'host.docker.internal:host-gateway'
   logging:
-    driver: "json-file"
+    driver: json-file
     options:
-      max-size: "10m"
-      max-file: "3"
-      compress: "true"
-
-x-common-env: &common-env
-  REDIS_URL: ${REDIS_URL:-redis://redis:6379}
-  REDIS_RATE_LIMIT_URL: ${REDIS_URL:-redis://redis:6379}
-  PLAYWRIGHT_MICROSERVICE_URL: ${PLAYWRIGHT_MICROSERVICE_URL:-http://playwright-service:3000/scrape}
-  POSTGRES_USER: ${POSTGRES_USER:-postgres}
-  POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
-  POSTGRES_DB: ${POSTGRES_DB:-postgres}
-  POSTGRES_HOST: ${POSTGRES_HOST:-nuq-postgres}
-  POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-  USE_DB_AUTHENTICATION: ${USE_DB_AUTHENTICATION:-false}
-  NUM_WORKERS_PER_QUEUE: ${NUM_WORKERS_PER_QUEUE:-8}
-  CRAWL_CONCURRENT_REQUESTS: ${CRAWL_CONCURRENT_REQUESTS:-10}
-  MAX_CONCURRENT_JOBS: ${MAX_CONCURRENT_JOBS:-5}
-  BROWSER_POOL_SIZE: ${BROWSER_POOL_SIZE:-5}
-  OPENAI_API_KEY: ${OPENAI_API_KEY}
-  OPENAI_BASE_URL: ${OPENAI_BASE_URL}
-  MODEL_NAME: ${MODEL_NAME}
-  MODEL_EMBEDDING_NAME: ${MODEL_EMBEDDING_NAME} 
-  OLLAMA_BASE_URL: ${OLLAMA_BASE_URL} 
-  AUTUMN_SECRET_KEY: ${AUTUMN_SECRET_KEY}
-  SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
-  BULL_AUTH_KEY: ${BULL_AUTH_KEY}
-  TEST_API_KEY: ${TEST_API_KEY}
-  SUPABASE_ANON_TOKEN: ${SUPABASE_ANON_TOKEN}
-  SUPABASE_URL: ${SUPABASE_URL}
-  SUPABASE_SERVICE_TOKEN: ${SUPABASE_SERVICE_TOKEN}
-  SELF_HOSTED_WEBHOOK_URL: ${SELF_HOSTED_WEBHOOK_URL}
-  LOGGING_LEVEL: ${LOGGING_LEVEL}
-  PROXY_SERVER: ${PROXY_SERVER}
-  PROXY_USERNAME: ${PROXY_USERNAME}
-  PROXY_PASSWORD: ${PROXY_PASSWORD}
-  SEARXNG_ENDPOINT: ${SEARXNG_ENDPOINT}
-  SEARXNG_ENGINES: ${SEARXNG_ENGINES}
-  SEARXNG_CATEGORIES: ${SEARXNG_CATEGORIES}
-
+      max-size: 10m
+      max-file: '3'
+      compress: 'true'
+x-common-env:
+  REDIS_URL: '${REDIS_URL:-redis://redis:6379}'
+  REDIS_RATE_LIMIT_URL: '${REDIS_URL:-redis://redis:6379}'
+  PLAYWRIGHT_MICROSERVICE_URL: '${PLAYWRIGHT_MICROSERVICE_URL:-http://playwright-service:3000/scrape}'
+  POSTGRES_USER: '${POSTGRES_USER:-postgres}'
+  POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgres}'
+  POSTGRES_DB: '${POSTGRES_DB:-postgres}'
+  POSTGRES_HOST: '${POSTGRES_HOST:-nuq-postgres}'
+  POSTGRES_PORT: '${POSTGRES_PORT:-5432}'
+  USE_DB_AUTHENTICATION: '${USE_DB_AUTHENTICATION:-false}'
+  NUM_WORKERS_PER_QUEUE: '${NUM_WORKERS_PER_QUEUE:-4}'
+  CRAWL_CONCURRENT_REQUESTS: '${CRAWL_CONCURRENT_REQUESTS:-5}'
+  MAX_CONCURRENT_JOBS: '${MAX_CONCURRENT_JOBS:-3}'
+  BROWSER_POOL_SIZE: '${BROWSER_POOL_SIZE:-3}'
+  OPENAI_API_KEY: '${OPENAI_API_KEY:-}'
+  OPENAI_BASE_URL: '${OPENAI_BASE_URL:-}'
+  MODEL_NAME: '${MODEL_NAME:-}'
+  MODEL_EMBEDDING_NAME: '${MODEL_EMBEDDING_NAME:-}'
+  OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-}'
+  AUTUMN_SECRET_KEY: '${AUTUMN_SECRET_KEY:-}'
+  SLACK_WEBHOOK_URL: '${SLACK_WEBHOOK_URL:-}'
+  BULL_AUTH_KEY: '${BULL_AUTH_KEY:-}'
+  TEST_API_KEY: '${TEST_API_KEY:-}'
+  SUPABASE_ANON_TOKEN: '${SUPABASE_ANON_TOKEN:-}'
+  SUPABASE_URL: '${SUPABASE_URL:-}'
+  SUPABASE_SERVICE_TOKEN: '${SUPABASE_SERVICE_TOKEN:-}'
+  SELF_HOSTED_WEBHOOK_URL: '${SELF_HOSTED_WEBHOOK_URL:-}'
+  LOGGING_LEVEL: '${LOGGING_LEVEL:-info}'
+  PROXY_SERVER: '${PROXY_SERVER:-}'
+  PROXY_USERNAME: '${PROXY_USERNAME:-}'
+  PROXY_PASSWORD: '${PROXY_PASSWORD:-}'
+  SEARXNG_ENDPOINT: '${SEARXNG_ENDPOINT:-}'
+  SEARXNG_ENGINES: '${SEARXNG_ENGINES:-}'
+  SEARXNG_CATEGORIES: '${SEARXNG_CATEGORIES:-}'
 services:
   playwright-service:
-    # NOTE: If you don't want to build the service locally,
-    # comment out the build: statement and uncomment the image: statement
-    # image: ghcr.io/firecrawl/playwright-service:latest
     build: apps/playwright-service-ts
     environment:
       PORT: 3000
-      PROXY_SERVER: ${PROXY_SERVER}
-      PROXY_USERNAME: ${PROXY_USERNAME}
-      PROXY_PASSWORD: ${PROXY_PASSWORD}
-      ALLOW_LOCAL_WEBHOOKS: ${ALLOW_LOCAL_WEBHOOKS}
-      BLOCK_MEDIA: ${BLOCK_MEDIA}
-      # Configure maximum concurrent pages for Playwright browser instances
-      MAX_CONCURRENT_PAGES: ${CRAWL_CONCURRENT_REQUESTS:-10}
+      PROXY_SERVER: '${PROXY_SERVER:-}'
+      PROXY_USERNAME: '${PROXY_USERNAME:-}'
+      PROXY_PASSWORD: '${PROXY_PASSWORD:-}'
+      ALLOW_LOCAL_WEBHOOKS: '${ALLOW_LOCAL_WEBHOOKS:-false}'
+      BLOCK_MEDIA: '${BLOCK_MEDIA:-true}'
+      MAX_CONCURRENT_PAGES: '${CRAWL_CONCURRENT_REQUESTS:-5}'
     networks:
       - backend
-    # Resource limits for Docker Compose (not Swarm)
-    cpus: 2.0
-    mem_limit: 4G
-    memswap_limit: 4G
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "10m"
-        max-file: "3"
-        compress: "true"
+        max-size: 10m
+        max-file: '3'
+        compress: 'true'
     tmpfs:
-      - /tmp/.cache:noexec,nosuid,size=1g
-
+      - '/tmp/.cache:noexec,nosuid,size=1g'
   api:
-    <<: *common-service
+    build: apps/api
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    networks:
+      - backend
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+        compress: 'true'
     environment:
-      <<: *common-env
-      HOST: "0.0.0.0"
-      PORT: ${INTERNAL_PORT:-3002}
-      EXTRACT_WORKER_PORT: ${EXTRACT_WORKER_PORT:-3004}
-      WORKER_PORT: ${WORKER_PORT:-3005}
-      NUQ_RABBITMQ_URL: amqp://rabbitmq:5672
+      REDIS_URL: '${REDIS_URL:-redis://redis:6379}'
+      REDIS_RATE_LIMIT_URL: '${REDIS_URL:-redis://redis:6379}'
+      PLAYWRIGHT_MICROSERVICE_URL: '${PLAYWRIGHT_MICROSERVICE_URL:-http://playwright-service:3000/scrape}'
+      POSTGRES_USER: '${POSTGRES_USER:-postgres}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgres}'
+      POSTGRES_DB: '${POSTGRES_DB:-postgres}'
+      POSTGRES_HOST: '${POSTGRES_HOST:-nuq-postgres}'
+      POSTGRES_PORT: '${POSTGRES_PORT:-5432}'
+      USE_DB_AUTHENTICATION: '${USE_DB_AUTHENTICATION:-false}'
+      NUM_WORKERS_PER_QUEUE: '${NUM_WORKERS_PER_QUEUE:-4}'
+      CRAWL_CONCURRENT_REQUESTS: '${CRAWL_CONCURRENT_REQUESTS:-5}'
+      MAX_CONCURRENT_JOBS: '${MAX_CONCURRENT_JOBS:-3}'
+      BROWSER_POOL_SIZE: '${BROWSER_POOL_SIZE:-3}'
+      OPENAI_API_KEY: '${OPENAI_API_KEY:-}'
+      OPENAI_BASE_URL: '${OPENAI_BASE_URL:-}'
+      MODEL_NAME: '${MODEL_NAME:-}'
+      MODEL_EMBEDDING_NAME: '${MODEL_EMBEDDING_NAME:-}'
+      OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-}'
+      AUTUMN_SECRET_KEY: '${AUTUMN_SECRET_KEY:-}'
+      SLACK_WEBHOOK_URL: '${SLACK_WEBHOOK_URL:-}'
+      BULL_AUTH_KEY: '${BULL_AUTH_KEY:-}'
+      TEST_API_KEY: '${TEST_API_KEY:-}'
+      SUPABASE_ANON_TOKEN: '${SUPABASE_ANON_TOKEN:-}'
+      SUPABASE_URL: '${SUPABASE_URL:-}'
+      SUPABASE_SERVICE_TOKEN: '${SUPABASE_SERVICE_TOKEN:-}'
+      SELF_HOSTED_WEBHOOK_URL: '${SELF_HOSTED_WEBHOOK_URL:-}'
+      LOGGING_LEVEL: '${LOGGING_LEVEL:-info}'
+      PROXY_SERVER: '${PROXY_SERVER:-}'
+      PROXY_USERNAME: '${PROXY_USERNAME:-}'
+      PROXY_PASSWORD: '${PROXY_PASSWORD:-}'
+      SEARXNG_ENDPOINT: '${SEARXNG_ENDPOINT:-}'
+      SEARXNG_ENGINES: '${SEARXNG_ENGINES:-}'
+      SEARXNG_CATEGORIES: '${SEARXNG_CATEGORIES:-}'
+      HOST: 0.0.0.0
+      PORT: '${INTERNAL_PORT:-3002}'
+      EXTRACT_WORKER_PORT: '${EXTRACT_WORKER_PORT:-3004}'
+      WORKER_PORT: '${WORKER_PORT:-3005}'
+      NUQ_RABBITMQ_URL: 'amqp://rabbitmq:5672'
       ENV: local
     depends_on:
       redis:
@@ -104,64 +134,64 @@ services:
       rabbitmq:
         condition: service_healthy
     ports:
-      - "${PORT:-3002}:${INTERNAL_PORT:-3002}"
-    command: node dist/src/harness.js --start-docker
-    # Resource limits for Docker Compose (not Swarm)
-    # Increase if you have more CPU cores/RAM available
-    cpus: 4.0
-    mem_limit: 8G
-    memswap_limit: 8G
-
+      - '${PORT:-3002}:${INTERNAL_PORT:-3002}'
+    command: 'node dist/src/harness.js --start-docker'
   redis:
-    # NOTE: If you want to use Valkey (open source) instead of Redis (source available),
-    # uncomment the Valkey statement and comment out the Redis statement.
-    # Using Valkey with Firecrawl is untested and not guaranteed to work. Use with caution.
-    image: redis:alpine
-    # image: valkey/valkey:alpine
-
+    image: 'redis:alpine'
     networks:
       - backend
-    command: redis-server --bind 0.0.0.0
+    command: 'redis-server --bind 0.0.0.0'
+    volumes:
+      - redis_data:/data
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "5m"
-        max-file: "2"
-        compress: "true"
-    
+        max-size: 5m
+        max-file: '2'
+        compress: 'true'
   rabbitmq:
-    image: rabbitmq:3-management
+    image: 'rabbitmq:3-management'
     networks:
       - backend
     command: rabbitmq-server
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      test:
+        - CMD
+        - rabbitmq-diagnostics
+        - '-q'
+        - check_running
       interval: 5s
       timeout: 5s
       retries: 3
       start_period: 5s
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "5m"
-        max-file: "2"
-        compress: "true"
-  
+        max-size: 5m
+        max-file: '2'
+        compress: 'true'
   nuq-postgres:
     build: apps/nuq-postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: '${POSTGRES_USER:-postgres}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgres}'
+      POSTGRES_DB: '${POSTGRES_DB:-postgres}'
     networks:
       - backend
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "10m"
-        max-file: "3"
-        compress: "true"
-
+        max-size: 10m
+        max-file: '3'
+        compress: 'true'
+volumes:
+  redis_data:
+  rabbitmq_data:
+  postgres_data:
 networks:
   backend:
     driver: bridge

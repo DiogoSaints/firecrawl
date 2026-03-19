@@ -162,10 +162,10 @@ services:
         - rabbitmq-diagnostics
         - '-q'
         - check_running
-      interval: 5s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
     logging:
       driver: json-file
       options:

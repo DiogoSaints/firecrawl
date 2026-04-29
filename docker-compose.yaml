@@ -44,7 +44,7 @@ x-common-env:
   SUPABASE_SERVICE_TOKEN: "${SUPABASE_SERVICE_TOKEN:-}"
   SELF_HOSTED_WEBHOOK_URL: "${SELF_HOSTED_WEBHOOK_URL:-}"
   LOGGING_LEVEL: "${LOGGING_LEVEL:-info}"
-  PROXY_SERVER: "${PROXY_SERVER:-}"
+  PROXY_SERVER: "p.webshare.io:80"
   PROXY_USERNAME: "${PROXY_USERNAME:-}"
   PROXY_PASSWORD: "${PROXY_PASSWORD:-}"
   SEARXNG_ENDPOINT: "${SEARXNG_ENDPOINT:-}"
@@ -56,7 +56,7 @@ services:
     environment:
       PORT: 3000
       NO_PROXY: "localhost,127.0.0.1,redis,rabbitmq,nuq-postgres,playwright-service,host.docker.internal"
-      PROXY_SERVER: "${PROXY_SERVER:-}"
+      PROXY_SERVER: "http://p.webshare.io:80"
       PROXY_USERNAME: "${PROXY_USERNAME:-}"
       PROXY_PASSWORD: "${PROXY_PASSWORD:-}"
       ALLOW_LOCAL_WEBHOOKS: "${ALLOW_LOCAL_WEBHOOKS:-false}"
@@ -117,7 +117,7 @@ services:
       SUPABASE_SERVICE_TOKEN: "${SUPABASE_SERVICE_TOKEN:-}"
       SELF_HOSTED_WEBHOOK_URL: "${SELF_HOSTED_WEBHOOK_URL:-}"
       LOGGING_LEVEL: "${LOGGING_LEVEL:-info}"
-      PROXY_SERVER: "${PROXY_SERVER:-}"
+      PROXY_SERVER: "p.webshare.io:80"
       PROXY_USERNAME: "${PROXY_USERNAME:-}"
       PROXY_PASSWORD: "${PROXY_PASSWORD:-}"
       SEARXNG_ENDPOINT: "${SEARXNG_ENDPOINT:-}"

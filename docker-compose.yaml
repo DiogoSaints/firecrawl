@@ -56,9 +56,9 @@ services:
     environment:
       PORT: 3000
       NO_PROXY: "localhost,127.0.0.1,redis,rabbitmq,nuq-postgres,playwright-service,host.docker.internal"
-      PROXY_SERVER: "http://${PROXY_USERNAME:-}:${PROXY_PASSWORD:-}@p.webshare.io:80"
-      PROXY_USERNAME: ""
-      PROXY_PASSWORD: ""
+      PROXY_SERVER: "p.webshare.io:80"
+      PROXY_USERNAME: "${PROXY_USERNAME:-}"
+      PROXY_PASSWORD: "${PROXY_PASSWORD:-}"
       ALLOW_LOCAL_WEBHOOKS: "${ALLOW_LOCAL_WEBHOOKS:-false}"
       BLOCK_MEDIA: "${BLOCK_MEDIA:-true}"
       MAX_CONCURRENT_PAGES: "${CRAWL_CONCURRENT_REQUESTS:-5}"
